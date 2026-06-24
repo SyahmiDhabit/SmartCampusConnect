@@ -1,0 +1,5 @@
+com\smartcampus\student\controller\StudentController.class
+com\smartcampus\student\entity\Student.class
+com\smartcampus\student\StudentServiceApplication.class
+com\smartcampus\student\seeder\DatabaseSeeder.class
+com\smartcampus\student\repository\StudentRepository.class
