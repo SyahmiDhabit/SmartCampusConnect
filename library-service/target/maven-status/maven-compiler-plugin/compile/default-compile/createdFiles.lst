@@ -1,0 +1,13 @@
+com\smartcampus\library\repository\BookLoanRepository.class
+com\smartcampus\library\controller\BookingController.class
+com\smartcampus\library\soap\SOAPEndpointPublisher.class
+com\smartcampus\library\entity\BookLoan.class
+com\smartcampus\library\soap\RoomAlreadyBookedFault.class
+com\smartcampus\library\LibraryServiceApplication.class
+com\smartcampus\library\controller\LibraryController.class
+com\smartcampus\library\soap\LibrarySOAPService.class
+com\smartcampus\library\service\LibraryEventPublisher.class
+com\smartcampus\library\soap\LibrarySOAPServiceImpl.class
+com\smartcampus\library\repository\RoomBookingRepository.class
+com\smartcampus\library\entity\RoomBooking.class
+com\smartcampus\library\soap\BookAlreadyLoanedFault.class

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.maven.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.maven.org/POM/4.0.0 http://www.maven.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.smartcampus</groupId>
+    <artifactId>smartcampus-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>SmartCampus Connect Parent</name>
+    <description>Parent POM for SmartCampus Connect Distributed Backend Services</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jaxws.rt.version>4.0.2</jaxws.rt.version>
+        <postgresql.version>42.7.3</postgresql.version>
+    </properties>
+
+    <modules>
+        <module>shared-messaging</module>
+        <module>student-service</module>
+        <module>enrolment-service</module>
+        <module>notification-service</module>
+        <module>library-service</module>
+        <module>reporting-service</module>
+        <module>load-test</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Common internal modules -->
+            <dependency>
+                <groupId>com.smartcampus</groupId>
+                <artifactId>shared-messaging</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- SOAP/JAX-WS runtime dependency for modern Java -->
+            <dependency>
+                <groupId>com.sun.xml.ws</groupId>
+                <artifactId>jaxws-rt</artifactId>
+                <version>${jaxws.rt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

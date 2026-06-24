@@ -1,0 +1,6 @@
+com\smartcampus\shared\messaging\MessageSender.class
+com\smartcampus\shared\messaging\CampusEvent.class
+com\smartcampus\shared\messaging\EventPublisher.class
+com\smartcampus\shared\messaging\Message.class
+com\smartcampus\shared\messaging\RabbitMqConstants.class
+com\smartcampus\shared\messaging\config\RabbitMQConfig.class
