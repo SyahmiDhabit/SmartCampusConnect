@@ -1,0 +1,284 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: scc-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scc-network
+
+  student-db:
+    image: postgres:16-alpine
+    container_name: scc-student-db
+    environment:
+      POSTGRES_DB: student_db
+      POSTGRES_USER: scc
+      POSTGRES_PASSWORD: scc_secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - scc-student-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scc -d student_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scc-network
+
+  enrolment-db:
+    image: postgres:16-alpine
+    container_name: scc-enrolment-db
+    environment:
+      POSTGRES_DB: enrolment_db
+      POSTGRES_USER: scc
+      POSTGRES_PASSWORD: scc_secret
+    ports:
+      - "5434:5432"
+    volumes:
+      - scc-enrolment-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scc -d enrolment_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scc-network
+
+  notification-db:
+    image: postgres:16-alpine
+    container_name: scc-notification-db
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: scc
+      POSTGRES_PASSWORD: scc_secret
+    ports:
+      - "5435:5432"
+    volumes:
+      - scc-notification-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scc -d notification_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scc-network
+
+  library-db:
+    image: postgres:16-alpine
+    container_name: scc-library-db
+    environment:
+      POSTGRES_DB: library_db
+      POSTGRES_USER: scc
+      POSTGRES_PASSWORD: scc_secret
+    ports:
+      - "5436:5432"
+    volumes:
+      - scc-library-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scc -d library_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scc-network
+
+  reporting-db:
+    image: postgres:16-alpine
+    container_name: scc-reporting-db
+    environment:
+      POSTGRES_DB: reporting_db
+      POSTGRES_USER: scc
+      POSTGRES_PASSWORD: scc_secret
+    ports:
+      - "5437:5432"
+    volumes:
+      - scc-reporting-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scc -d reporting_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scc-network
+
+  student-profile-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_MODULE: student-service
+        SERVICE_PORT: 8081
+    container_name: scc-student-profile-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: student-db
+      DB_NAME: student_db
+      DB_USER: scc
+      DB_PASSWORD: scc_secret
+      SPRING_RABBITMQ_HOST: rabbitmq
+    depends_on:
+      student-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    networks:
+      - scc-network
+
+  course-enrolment-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_MODULE: enrolment-service
+        SERVICE_PORT: 8082
+    container_name: scc-course-enrolment-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: enrolment-db
+      DB_NAME: enrolment_db
+      DB_USER: scc
+      DB_PASSWORD: scc_secret
+      SPRING_RABBITMQ_HOST: rabbitmq
+      STUDENT_PROFILE_BASE_URL: http://student-profile-service:8081
+    depends_on:
+      enrolment-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      student-profile-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    networks:
+      - scc-network
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_MODULE: notification-service
+        SERVICE_PORT: 8083
+    container_name: scc-notification-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: notification-db
+      DB_NAME: notification_db
+      DB_USER: scc
+      DB_PASSWORD: scc_secret
+      SPRING_RABBITMQ_HOST: rabbitmq
+    depends_on:
+      notification-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8083/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    networks:
+      - scc-network
+
+  library-booking-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_MODULE: library-service
+        SERVICE_PORT: 8084
+    container_name: scc-library-booking-service
+    ports:
+      - "8084:8084"
+      - "8088:8088"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: library-db
+      DB_NAME: library_db
+      DB_USER: scc
+      DB_PASSWORD: scc_secret
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SOAP_HOST: 0.0.0.0
+      SOAP_PORT: 8088
+    depends_on:
+      library-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8084/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    networks:
+      - scc-network
+
+  reporting-analytics-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_MODULE: reporting-service
+        SERVICE_PORT: 8085
+    container_name: scc-reporting-analytics-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: reporting-db
+      DB_NAME: reporting_db
+      DB_USER: scc
+      DB_PASSWORD: scc_secret
+      SPRING_RABBITMQ_HOST: rabbitmq
+      STUDENT_PROFILE_BASE_URL: http://student-profile-service:8081
+      COURSE_ENROLMENT_BASE_URL: http://course-enrolment-service:8082
+      LIBRARY_BASE_URL: http://library-booking-service:8084
+    depends_on:
+      reporting-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8085/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    networks:
+      - scc-network
+
+networks:
+  scc-network:
+    name: scc-network
+
+volumes:
+  scc-student-db-data:
+  scc-enrolment-db-data:
+  scc-notification-db-data:
+  scc-library-db-data:
+  scc-reporting-db-data:
