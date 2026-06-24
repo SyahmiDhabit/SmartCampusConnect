@@ -1,0 +1,13 @@
+com\smartcampus\enrolment\entity\CachedStudent.class
+com\smartcampus\enrolment\repository\EnrolmentRepository.class
+com\smartcampus\enrolment\client\StudentClient$VerificationResult.class
+com\smartcampus\enrolment\repository\CachedStudentRepository.class
+com\smartcampus\enrolment\EnrolmentServiceApplication.class
+com\smartcampus\enrolment\entity\Enrolment.class
+com\smartcampus\enrolment\entity\CourseCapacity.class
+com\smartcampus\enrolment\resilience\SimpleCircuitBreaker.class
+com\smartcampus\enrolment\resilience\SimpleCircuitBreaker$State.class
+com\smartcampus\enrolment\client\StudentClient.class
+com\smartcampus\enrolment\service\EnrolmentService.class
+com\smartcampus\enrolment\repository\CourseCapacityRepository.class
+com\smartcampus\enrolment\controller\EnrolmentController.class
