@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartCampus Connect - Dashboard</title>
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <span class="brand-name">SmartCampus</span>
+    </div>
+    
+    <ul class="nav-links">
+      <li>
+        <a href="#" class="nav-item active" data-tab="students">
+          <i class="fa-solid fa-user-graduate"></i> Students
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item" data-tab="enrolments">
+          <i class="fa-solid fa-book-open"></i> Enrolments
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item" data-tab="library">
+          <i class="fa-solid fa-book-bookmark"></i> Library & Rooms
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item" data-tab="notifications">
+          <i class="fa-solid fa-bell"></i> Notifications
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-item" data-tab="dashboard">
+          <i class="fa-solid fa-chart-line"></i> Reporting / Analytics Service
+        </a>
+      </li>
+    </ul>
+    
+    <div class="sidebar-footer">
+      <div class="system-badge">
+        <div class="pulse-dot"></div>
+        <span>Stack Connected (MySQL)</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-content">
+    
+    <!-- ----------------------------------------------------
+         DASHBOARD TAB
+         ---------------------------------------------------- -->
+    <section id="dashboard-tab" class="tab-content">
+      <header>
+        <div class="header-title">
+          <h1>Reporting / Analytics Service</h1>
+          <p>Produces aggregated views (e.g. enrolment counts per programme) by reading from the other services</p>
+        </div>
+      </header>
+
+      <!-- Section 1: Microservice Status (Online Part) -->
+      <h2 class="dashboard-section-title"><i class="fa-solid fa-server"></i> Microservice Cluster Status</h2>
+      <!-- Services Health Checks -->
+      <div class="grid-3">
+        <div class="card health-card">
+          <div class="health-info">
+            <div class="health-icon" style="background-color: var(--accent-blue-glow); color: var(--accent-blue);">
+              <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div>
+              <h3>Student API</h3>
+              <p>Profile & GPA Repository</p>
+            </div>
+          </div>
+          <span id="student-service-status" class="status-badge status-offline">Offline</span>
+        </div>
+
+        <div class="card health-card">
+          <div class="health-info">
+            <div class="health-icon" style="background-color: var(--accent-purple-glow); color: var(--accent-purple);">
+              <i class="fa-solid fa-clipboard-list"></i>
+            </div>
+            <div>
+              <h3>Enrolment API</h3>
+              <p>Course Allocations</p>
+            </div>
+          </div>
+          <span id="enrolment-service-status" class="status-badge status-offline">Offline</span>
+        </div>
+
+        <div class="card health-card">
+          <div class="health-info">
+            <div class="health-icon" style="background-color: var(--accent-emerald-glow); color: var(--accent-emerald);">
+              <i class="fa-solid fa-building-columns"></i>
+            </div>
+            <div>
+              <h3>Library API</h3>
+              <p>Book & Room Services</p>
+            </div>
+          </div>
+          <span id="library-service-status" class="status-badge status-offline">Offline</span>
+        </div>
+
+        <div class="card health-card">
+          <div class="health-info">
+            <div class="health-icon" style="background-color: var(--accent-blue-glow); color: var(--accent-blue);">
+              <i class="fa-solid fa-bell"></i>
+            </div>
+            <div>
+              <h3>Notification API</h3>
+              <p>RabbitMQ Event Consumer</p>
+            </div>
+          </div>
+          <span id="notification-service-status" class="status-badge status-offline">Offline</span>
+        </div>
+
+        <div class="card health-card">
+          <div class="health-info">
+            <div class="health-icon" style="background-color: var(--accent-purple-glow); color: var(--accent-purple);">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div>
+              <h3>Reporting API</h3>
+              <p>Analytics & Aggregates</p>
+            </div>
+          </div>
+          <span id="reporting-service-status" class="status-badge status-offline">Offline</span>
+        </div>
+      </div>
+
+      <!-- Section 2: Key Metrics -->
+      <h2 class="dashboard-section-title"><i class="fa-solid fa-chart-line"></i> Key System Metrics</h2>
+      <!-- Core System Metrics -->
+      <div class="grid-3">
+        <div class="card metric-card">
+          <div class="metric-label"><i class="fa-solid fa-graduation-cap"></i> Total Enrolments</div>
+          <div id="metric-total-enrolments" class="metric-value">0</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-label"><i class="fa-solid fa-book"></i> Total Library Loans</div>
+          <div id="metric-total-loans" class="metric-value">0</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-label"><i class="fa-solid fa-door-open"></i> Total Room Bookings</div>
+          <div id="metric-total-bookings" class="metric-value">0</div>
+        </div>
+      </div>
+
+      <!-- Section 3: Course Enrolment & Breakdown -->
+      <h2 class="dashboard-section-title"><i class="fa-solid fa-chart-pie"></i> Programme Enrolment Analytics</h2>
+      <!-- Enrolment Chart and Breakdown -->
+      <div class="grid-2">
+        <div class="card">
+          <h2 class="form-title" style="border: none; margin-bottom: 0;"><i class="fa-solid fa-chart-simple"></i> Course Enrolment by Programme</h2>
+          <div id="programme-chart-container" class="chart-bar-container">
+            <!-- Dynamic Chart Bars -->
+            <div style="color: var(--text-muted); text-align: center; padding: 1.5rem;">Loading metrics...</div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="form-title" style="border: none; margin-bottom: 1.5rem;"><i class="fa-solid fa-circle-check"></i> Enrolment Statuses</h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem;">
+              <span style="color: var(--text-secondary); font-weight: 500;">CONFIRMED</span>
+              <span id="status-confirmed" style="font-weight: 700; color: var(--accent-emerald);">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------
+         STUDENTS MANAGEMENT TAB
+         ---------------------------------------------------- -->
+    <section id="students-tab" class="tab-content active">
+      <header>
+        <div class="header-title">
+          <h1>Student Administration</h1>
+          <p>Register profiles, view academic details, and manage student GPA metrics</p>
+        </div>
+      </header>
+
+      <div class="grid-2">
+        <!-- Students list card -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 class="form-title" style="border: none; margin: 0;"><i class="fa-solid fa-address-book"></i> Student Registry</h2>
+            <button class="btn btn-secondary" onclick="loadStudents()" style="width: auto; padding: 0.5rem 1rem;"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+          </div>
+          <div class="table-container student-registry-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Programme</th>
+                  <th>GPA</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="students-table-body">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading students registry...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Create/Edit Form card -->
+        <div class="card">
+          <h2 class="form-title" id="student-form-title"><i class="fa-solid fa-user-plus"></i> Register New Student</h2>
+          <form id="student-form">
+            <div class="form-group">
+              <label for="student-id">Student ID</label>
+              <input type="text" id="student-id" class="form-control" placeholder="e.g. S1001" required>
+            </div>
+            <div class="form-group">
+              <label for="student-name">Full Name</label>
+              <input type="text" id="student-name" class="form-control" placeholder="e.g. Alice Smith" required>
+            </div>
+            <div class="form-group">
+              <label for="student-email">Email Address</label>
+              <input type="email" id="student-email" class="form-control" placeholder="e.g. alice@university.edu" required>
+            </div>
+            <div class="form-group">
+              <label for="student-programme">Academic Programme</label>
+              <select id="student-programme" class="form-control" required>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Systems">Information Systems</option>
+                <option value="Business Analytics">Business Analytics</option>
+                <option value="Software Engineering">Software Engineering</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Electrical Engineering">Electrical Engineering</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="student-gpa">GPA Rating (0.00 - 4.00)</label>
+              <input type="number" id="student-gpa" class="form-control" placeholder="e.g. 3.85" min="0" max="4" step="0.01" required>
+            </div>
+            
+            <button type="submit" id="student-submit-btn" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Register Student</button>
+            <button type="button" id="student-cancel-btn" class="btn btn-secondary" style="margin-top: 0.5rem; display: none;" onclick="cancelEditStudent()">Cancel Edit</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------
+         ENROLMENTS TAB
+         ---------------------------------------------------- -->
+    <section id="enrolments-tab" class="tab-content">
+      <header>
+        <div class="header-title">
+          <h1>Course Enrolments</h1>
+          <p>Register courses and monitor provisional/confirmed student rosters</p>
+        </div>
+      </header>
+
+      <div class="grid-2">
+        <!-- Roster card -->
+        <div class="card">
+          <h2 class="form-title"><i class="fa-solid fa-list-check"></i> Course Enrolment Log</h2>
+          <div class="table-container enrolment-log-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Enrolment ID</th>
+                  <th>Student ID</th>
+                  <th>Course Code</th>
+                  <th>Semester</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="enrolments-table-body">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading enrolment data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Registration form -->
+        <div class="card">
+          <h2 class="form-title"><i class="fa-solid fa-right-to-bracket"></i> Enrol Student</h2>
+          <form id="enrolment-form">
+            <div class="form-group">
+              <label for="enrol-student-select">Select Registered Student</label>
+              <select id="enrol-student-select" class="form-control" required>
+                <option value="">-- Loading Students --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="enrol-course">Course Code</label>
+              <select id="enrol-course" class="form-control" required>
+                <option value="">-- Select Course --</option>
+                <optgroup label="Computer Science">
+                  <option value="CSE301">CSE301 - Introduction to Programming</option>
+                  <option value="CSE302">CSE302 - Data Structures</option>
+                  <option value="CSE303">CSE303 - Algorithms</option>
+                  <option value="CSE304">CSE304 - Databases</option>
+                  <option value="CSE305">CSE305 - Operating Systems</option>
+                  <option value="CSE306">CSE306 - Computer Networks</option>
+                  <option value="CSE307">CSE307 - Software Engineering</option>
+                  <option value="CSE308">CSE308 - Artificial Intelligence</option>
+                  <option value="CSE309">CSE309 - Machine Learning</option>
+                  <option value="CSE310">CSE310 - Web Development</option>
+                </optgroup>
+                <optgroup label="Business">
+                  <option value="BUS201">BUS201 - Business Management</option>
+                  <option value="BUS202">BUS202 - Marketing Principles</option>
+                  <option value="BUS203">BUS203 - Financial Accounting</option>
+                  <option value="BUS204">BUS204 - Macroeconomics</option>
+                  <option value="BUS205">BUS205 - Microeconomics</option>
+                </optgroup>
+                <optgroup label="Mechanical Engineering">
+                  <option value="MEC401">MEC401 - Thermodynamics</option>
+                  <option value="MEC402">MEC402 - Fluid Mechanics</option>
+                  <option value="MEC403">MEC403 - Solid Mechanics</option>
+                  <option value="MEC404">MEC404 - Manufacturing Processes</option>
+                  <option value="MEC405">MEC405 - Heat Transfer</option>
+                  <option value="MEC406">MEC406 - Machine Design</option>
+                  <option value="MEC407">MEC407 - Robotics and Automation</option>
+                  <option value="MEC408">MEC408 - Dynamics of Machinery</option>
+                </optgroup>
+                <optgroup label="Electrical Engineering">
+                  <option value="ELE501">ELE501 - Electrical Circuits</option>
+                  <option value="ELE502">ELE502 - Signals and Systems</option>
+                  <option value="ELE503">ELE503 - Power Electronics</option>
+                  <option value="ELE504">ELE504 - Electromagnetic Theory</option>
+                  <option value="ELE505">ELE505 - Microprocessors</option>
+                  <option value="ELE506">ELE506 - Digital Logic Design</option>
+                  <option value="ELE507">ELE507 - Control Systems</option>
+                  <option value="ELE508">ELE508 - Communication Systems</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="enrol-semester">Academic Semester</label>
+              <input type="text" id="enrol-semester" class="form-control" placeholder="e.g. 2026-S1" required>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-circle-arrow-right"></i> Submit Enrolment</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------
+         LIBRARY & ROOM BOOKINGS TAB
+         ---------------------------------------------------- -->
+    <section id="library-tab" class="tab-content">
+      <header>
+        <div class="header-title">
+          <h1>Library & Facility Services</h1>
+          <p>Coordinate campus book loans and student discussion room reservations</p>
+        </div>
+      </header>
+
+      <!-- Book Loans Grid Section -->
+      <div class="grid-2">
+        <div class="card">
+          <h2 class="form-title"><i class="fa-solid fa-book-open-reader"></i> Active Book Loans</h2>
+          <div class="table-container book-loans-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Student ID</th>
+                  <th>Book ID</th>
+                  <th>Book Title</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="loans-table-body">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading active loans...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="form-title"><i class="fa-solid fa-bookmark"></i> Loan Out a Book</h2>
+          <form id="loan-form">
+            <div class="form-group">
+              <label for="loan-student-select">Select Student</label>
+              <select id="loan-student-select" class="form-control" required>
+                <option value="">-- Select Student --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="loan-book-select">Select Library Book</label>
+              <select id="loan-book-select" class="form-control" required>
+                <option value="">-- Select Book --</option>
+                <option value="B101">B101 - Introduction to Distributed Systems</option>
+                <option value="B102">B102 - Clean Architecture</option>
+                <option value="B103">B103 - Design Patterns</option>
+                <option value="B104">B104 - Refactoring: Improving the Design of Existing Code</option>
+                <option value="B105">B105 - The Pragmatic Programmer</option>
+                <option value="B106">B106 - Domain-Driven Design</option>
+                <option value="B107">B107 - Code Complete</option>
+                <option value="B108">B108 - Head First Java</option>
+                <option value="B109">B109 - Effective Java</option>
+                <option value="B110">B110 - Cracking the Coding Interview</option>
+                <option value="B111">B111 - Introduction to Algorithms</option>
+                <option value="B112">B112 - Artificial Intelligence: A Modern Approach</option>
+                <option value="B113">B113 - Computer Networking: A Top-Down Approach</option>
+                <option value="B114">B114 - Database System Concepts</option>
+                <option value="B115">B115 - Operating System Concepts</option>
+                <option value="B116">B116 - Structure and Interpretation of Computer Programs</option>
+                <option value="B117">B117 - Modern Operating Systems</option>
+                <option value="B118">B118 - Compilers: Principles, Techniques, and Tools</option>
+                <option value="B119">B119 - The Mythical Man-Month</option>
+                <option value="B120">B120 - Continuous Delivery</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-hand-holding-hand"></i> Record Loan</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Room Bookings Grid Section -->
+      <div class="grid-2" style="margin-top: 1rem;">
+        <div class="card">
+          <h2 class="form-title"><i class="fa-solid fa-users-rectangle"></i> Room Reservations</h2>
+          <div class="table-container room-reservations-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Student ID</th>
+                  <th>Room ID</th>
+                  <th>Room Name</th>
+                  <th>Date</th>
+                  <th>Time Slot</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-table-body">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading room bookings...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="form-title"><i class="fa-solid fa-calendar-plus"></i> Reserve Discussion Room</h2>
+          <form id="booking-form">
+            <div class="form-group">
+              <label for="booking-student-select">Select Student</label>
+              <select id="booking-student-select" class="form-control" required>
+                <option value="">-- Select Student --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="booking-room-select">Select Discussion Room</label>
+              <select id="booking-room-select" class="form-control" required>
+                <option value="">-- Select Room --</option>
+                <option value="R101">R101 - Discussion Room A</option>
+                <option value="R102">R102 - Discussion Room B</option>
+                <option value="R103">R103 - Project Room C</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="booking-date">Reservation Date</label>
+              <input type="date" id="booking-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="booking-time-select">Reservation Time Slot</label>
+              <select id="booking-time-select" class="form-control" required>
+                <option value="">-- Select Time Slot --</option>
+                <option value="09:00 - 11:00">09:00 - 11:00</option>
+                <option value="11:00 - 13:00">11:00 - 13:00</option>
+                <option value="13:00 - 15:00">13:00 - 15:00</option>
+                <option value="15:00 - 17:00">15:00 - 17:00</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-calendar-check"></i> Book Facility</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------
+         NOTIFICATION LOG TAB
+         ---------------------------------------------------- -->
+    <section id="notifications-tab" class="tab-content">
+      <header>
+        <div class="header-title">
+          <h1>RabbitMQ Event Stream</h1>
+          <p>Real-time event notification messages consumed by the Notification Service</p>
+        </div>
+      </header>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 class="form-title" style="border: none; margin: 0;"><i class="fa-solid fa-clock-rotate-left"></i> Campus Event Notifications Log</h2>
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-secondary" onclick="loadNotifications()" style="width: auto; padding: 0.5rem 1rem;"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+            <button class="btn btn-danger" onclick="clearNotificationLogs()" style="width: auto; padding: 0.5rem 1rem;"><i class="fa-solid fa-trash-can"></i> Clear Log</button>
+          </div>
+        </div>
+        
+        <div id="events-log-container" class="event-log">
+          <!-- Dynamic Event Cards -->
+          <div style="color: var(--text-muted); text-align: center; padding: 2rem;">Loading event feed...</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Container for Toast Notifications -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
