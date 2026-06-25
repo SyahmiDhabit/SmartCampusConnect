@@ -1,0 +1,6 @@
+com\smartcampus\notification\NotificationServiceApplication.class
+com\smartcampus\notification\repository\NotificationRecordRepository.class
+com\smartcampus\notification\registry\NotificationRegistry.class
+com\smartcampus\notification\entity\NotificationRecord.class
+com\smartcampus\notification\controller\NotificationController.class
+com\smartcampus\notification\messaging\CampusEventConsumer.class
