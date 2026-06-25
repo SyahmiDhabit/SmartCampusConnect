@@ -1,0 +1,10 @@
+com\smartcampus\reporting\entity\ProcessedEvent.class
+com\smartcampus\reporting\repository\ProcessedEventRepository.class
+com\smartcampus\reporting\repository\ProgrammeEnrolmentStatRepository.class
+com\smartcampus\reporting\controller\ReportingController.class
+com\smartcampus\reporting\entity\ReportMetric.class
+com\smartcampus\reporting\service\AnalyticsService.class
+com\smartcampus\reporting\ReportingServiceApplication.class
+com\smartcampus\reporting\repository\ReportMetricRepository.class
+com\smartcampus\reporting\entity\ProgrammeEnrolmentStat.class
+com\smartcampus\reporting\messaging\ReportingEventConsumer.class
