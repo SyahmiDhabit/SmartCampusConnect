@@ -152,55 +152,7 @@ Since the system adheres to the Database-per-Service pattern, there are no physi
 
 This sequence diagram illustrates the workflow of a course enrolment, showcasing synchronous validation, circuit breaker logic during partial outages, and asynchronous event propagation.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Client as Postman / Client
-    participant CES as Course Enrolment Service
-    participant SPS as Student Profile Service
-    participant RMQ as RabbitMQ Broker
-    participant NS as Notification Service
-    participant RAS as Reporting Service
-
-    Client->>CES: POST /api/enrolments {studentId, courseCode, semester}
-    Note over CES: Check course capacity in DB
-    
-    rect rgb(240, 248, 255)
-        Note over CES,SPS: Synchronous Verification
-        CES->>SPS: GET /api/students/{studentId} (Verify Profile)
-        alt Student Service is Online
-            SPS-->>CES: 200 OK {name, programme}
-            Note over CES: Update local cache with student details
-        else Student Service is Offline (Timeout or Connection Failure)
-            Note over CES: Circuit Breaker increments error count
-            alt Student exists in Local Cache
-                Note over CES: Retrieve student from CACHED_STUDENT table
-                Note over CES: Set Enrolment Status to CONFIRMED
-            else Student NOT in Local Cache
-                Note over CES: Degrade gracefully: Set Status to PROVISIONAL
-            end
-        end
-    end
-
-    Note over CES: Save enrolment record to enrolment_db
-    CES-->>Client: 201 Created {enrolment, warningIfDegraded}
-
-    rect rgb(255, 250, 240)
-        Note over CES,RMQ: Asynchronous Event Propagation
-        CES-)+RMQ: Publish Event 'enrolment.created'
-    end
-
-    par Route Event to Notification
-        RMQ-)+NS: Deliver to notification.events.queue
-        Note over NS: ReentrantLock protects shared counter
-        Note over NS: Save record to notification_db
-        NS--)-RMQ: Acknowledge
-    and Route Event to Reporting
-        RMQ-)+RAS: Deliver to reporting.events.queue
-        Note over RAS: Update aggregations in reporting_db
-        RAS--)-RMQ: Acknowledge
-    end
-```
+<img width="2200" height="3463" alt="Service Workflow Diagram" src="https://github.com/user-attachments/assets/276b0e46-4411-49cb-aab0-aecad0ba83e6" />
 
 ---
 
@@ -619,45 +571,7 @@ Asynchronous messaging ensures loose coupling and eventual consistency across se
 
 ### Messaging Flow Diagram
 
-```mermaid
-graph LR
-    subgraph Publisher Services
-        SPS[Student Service]
-        CES[Enrolment Service]
-        LBS[Library Service]
-    end
-
-    subgraph RabbitMQ Broker
-        EX[smartcampus.events<br>Topic Exchange]
-        NQ[notification.events.queue]
-        RQ[reporting.events.queue]
-        DLX[smartcampus.dlx<br>Dead Letter Exchange]
-        DLQ[smartcampus.dlq<br>Dead Letter Queue]
-    end
-
-    subgraph Consumer Services
-        NS[Notification Service]
-        RAS[Reporting Service]
-    end
-
-    %% Publishing
-    SPS -->|Publish event<br>student.*| EX
-    CES -->|Publish event<br>enrolment.*| EX
-    LBS -->|Publish event<br>library.*| EX
-
-    %% Routing
-    EX -->|Route matching enrolment.*<br>or library.* or student.*| NQ
-    EX -->|Route matching enrolment.*<br>or library.* or student.*| RQ
-
-    %% Delivering
-    NQ -->|Consume events| NS
-    RQ -->|Consume events| RAS
-
-    %% Dead Lettering
-    NS -->|Reject failed message| DLX
-    RAS -->|Reject failed message| DLX
-    DLX --> DLQ
-```
+<img width="3490" height="898" alt="Messaging Flow Diagram" src="https://github.com/user-attachments/assets/dea262cd-de39-4df7-8ec4-00c45336de8e" />
 
 ### Message Format
 Events are wrapped in a standard JSON envelope represented by `CampusEvent.java`.
